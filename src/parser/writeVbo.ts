@@ -76,6 +76,6 @@ function formatTime(seconds: number): string {
   return [
     String(h).padStart(2, '0'),
     String(m).padStart(2, '0'),
-    s.toFixed(2).padStart(5, '0'),
+    s.toFixed(3).padStart(6, '0'),
   ].join(':')
 }
