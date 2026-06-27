@@ -1,0 +1,29 @@
+.card {
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #111;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.fileName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  word-break: break-all;
+}
+
+.lapCount {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+  margin-left: 1rem;
+}
