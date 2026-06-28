@@ -31,10 +31,11 @@ export interface Lap {
    */
   preBoundarySample?: GpsSample
   /**
-   * The sample immediately after the start-line crossing that closes this lap.
-   * Appended after the last selected lap so RaceChrono can close the final lap.
+   * Several samples immediately after the start-line crossing that closes this lap.
+   * Appended after the last selected lap so RaceChrono sees the car travel past
+   * the SF line and closes the final lap (1 sample is not enough for it to commit).
    */
-  postBoundarySample?: GpsSample
+  postBoundarySamples?: GpsSample[]
 }
 
 /** Metadata extracted from a VBO file header */

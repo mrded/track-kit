@@ -43,8 +43,8 @@ export function mergeLaps(selectedLaps: SelectedLap[]): {
   // Append the sample just after the last lap's closing SF crossing so
   // RaceChrono can close the final lap rather than leaving it open.
   const lastLap = selectedLaps[selectedLaps.length - 1]!.lap
-  if (lastLap.postBoundarySample) {
-    allSamples.push(lastLap.postBoundarySample)
+  if (lastLap.postBoundarySamples) {
+    allSamples.push(...lastLap.postBoundarySamples)
   }
 
   return {

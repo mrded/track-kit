@@ -63,7 +63,7 @@ function detectByStartFinish(samples: GpsSample[], sf: StartFinishLine): Lap[] {
     if (lapSamples.length >= MIN_LAP_SAMPLES) {
       const lap = buildLap(lapSamples, laps.length, true, b0.time, b1.time)
       lap.preBoundarySample = b0.index > 0 ? samples[b0.index - 1] : undefined
-      lap.postBoundarySample = b1.index < samples.length ? samples[b1.index] : undefined
+      lap.postBoundarySamples = samples.slice(b1.index, Math.min(b1.index + 5, samples.length))
       laps.push(lap)
     }
   }
