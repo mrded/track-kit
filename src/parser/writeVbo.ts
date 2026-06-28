@@ -21,49 +21,43 @@ export function writeVbo(session: Session, samples: { raw: string; time: number 
   // Write data section
   lines.push('[data]')
 
-  // Rebuild timestamps so they start from 0 and increase monotonically
-  const rebuiltSamples = rebuildTimestamps(samples, session.header)
-
-  for (const sample of rebuiltSamples) {
-    lines.push(sample.raw)
+  for (const raw of fixCrossSessionTimestamps(samples, session.header)) {
+    lines.push(raw)
   }
 
   return lines.join('\r\n')
 }
 
 /**
- * Rebuild time fields so timestamps are continuous across merged laps.
- * The time difference between consecutive samples is preserved; only
- * the absolute offset is adjusted to start from the first sample's time.
+ * Samples from the same session are copied verbatim (raw strings are already
+ * correct). When a cross-session jump is detected (time goes backwards), all
+ * subsequent samples have their time field rewritten so the file stays
+ * monotonically increasing. Everything else in the raw line is untouched.
  */
-function rebuildTimestamps(
+function fixCrossSessionTimestamps(
   samples: { raw: string; time: number }[],
   header: VboHeader,
-): { raw: string }[] {
-  if (header.timeIndex < 0) {
-    return samples.map((s) => ({ raw: s.raw }))
-  }
+): string[] {
+  if (samples.length === 0) return []
 
-  const result: { raw: string }[] = []
+  let drift = 0 // total seconds added to compensate for backwards jumps
 
-  if (samples.length === 0) return result
+  return samples.map((sample, i) => {
+    if (i > 0) {
+      const prev = samples[i - 1]!
+      if (sample.time < prev.time) {
+        drift += prev.time - sample.time
+      }
+    }
 
-  const firstTime = samples[0]!.time
-  let lastOriginalTime = firstTime
-  let accumulatedTime = firstTime
+    if (drift === 0) return sample.raw
 
-  for (let i = 0; i < samples.length; i++) {
-    const sample = samples[i]!
-    const delta = i === 0 ? 0 : Math.max(0, sample.time - lastOriginalTime)
-    accumulatedTime = i === 0 ? firstTime : accumulatedTime + delta
-    lastOriginalTime = sample.time
-
-    const fields = sample.raw.includes('\t') ? sample.raw.split('\t') : sample.raw.split(/\s+/)
-    fields[header.timeIndex] = formatTime(accumulatedTime)
-    result.push({ raw: fields.join(' ') })
-  }
-
-  return result
+    // Only rewrite the time field; everything else stays verbatim.
+    const sep = sample.raw.includes('\t') ? '\t' : ' '
+    const fields = sample.raw.split(sep === '\t' ? '\t' : /\s+/)
+    fields[header.timeIndex] = formatTime(sample.time + drift)
+    return fields.join(sep)
+  })
 }
 
 /**
