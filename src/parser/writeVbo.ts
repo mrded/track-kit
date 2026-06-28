@@ -67,15 +67,12 @@ function rebuildTimestamps(
 }
 
 /**
- * Format a time value back to HH:MM:SS.SSS
+ * Format seconds-of-day back to VBO compact time: HHMMSS.CC
+ * e.g. 56649.10 → "154409.10" (15h 44m 09.10s)
  */
 function formatTime(seconds: number): string {
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
   const s = seconds % 60
-  return [
-    String(h).padStart(2, '0'),
-    String(m).padStart(2, '0'),
-    s.toFixed(3).padStart(6, '0'),
-  ].join(':')
+  return (h * 10000 + m * 100 + s).toFixed(2)
 }

@@ -24,6 +24,17 @@ export interface Lap {
   timeString: string
   /** True when the lap runs from start/finish crossing to start/finish crossing */
   isComplete: boolean
+  /**
+   * The sample immediately before the start-line crossing that opens this lap.
+   * Used during export so the merged file contains the SF crossing at the beginning
+   * of each selected lap (RaceChrono needs to see the crossing to start timing).
+   */
+  preBoundarySample?: GpsSample
+  /**
+   * The sample immediately after the start-line crossing that closes this lap.
+   * Appended after the last selected lap so RaceChrono can close the final lap.
+   */
+  postBoundarySample?: GpsSample
 }
 
 /** Metadata extracted from a VBO file header */

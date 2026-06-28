@@ -61,7 +61,10 @@ function detectByStartFinish(samples: GpsSample[], sf: StartFinishLine): Lap[] {
     const b1 = boundaries[i + 1]!
     const lapSamples = samples.slice(b0.index, b1.index)
     if (lapSamples.length >= MIN_LAP_SAMPLES) {
-      laps.push(buildLap(lapSamples, laps.length, true, b0.time, b1.time))
+      const lap = buildLap(lapSamples, laps.length, true, b0.time, b1.time)
+      lap.preBoundarySample = b0.index > 0 ? samples[b0.index - 1] : undefined
+      lap.postBoundarySample = b1.index < samples.length ? samples[b1.index] : undefined
+      laps.push(lap)
     }
   }
 
@@ -90,7 +93,7 @@ function detectByStartFinish(samples: GpsSample[], sf: StartFinishLine): Lap[] {
  */
 function findCrossingBoundaries(samples: GpsSample[], sf: StartFinishLine): Boundary[] {
   const boundaries: Boundary[] = []
-  let lastCrossingTime = samples[0]!.time
+  let lastCrossingTime = -Infinity
 
   for (let i = 1; i < samples.length; i++) {
     const a = samples[i - 1]!

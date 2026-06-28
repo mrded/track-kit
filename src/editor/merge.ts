@@ -22,8 +22,29 @@ export function mergeLaps(selectedLaps: SelectedLap[]): {
   const baseSession = selectedLaps[0]!.session
 
   const allSamples: GpsSample[] = []
-  for (const { lap } of selectedLaps) {
+
+  for (let i = 0; i < selectedLaps.length; i++) {
+    const { lap } = selectedLaps[i]!
+
+    // Prepend the sample just before this lap's SF crossing so the merged file
+    // contains a crossing at the start of each lap (RaceChrono needs to see the
+    // crossing to begin timing). Skip if it's already the last sample added
+    // (avoids duplicates when merging consecutive laps from the same session).
+    if (lap.preBoundarySample) {
+      const last = allSamples[allSamples.length - 1]
+      if (!last || last.raw !== lap.preBoundarySample.raw) {
+        allSamples.push(lap.preBoundarySample)
+      }
+    }
+
     allSamples.push(...lap.samples)
+  }
+
+  // Append the sample just after the last lap's closing SF crossing so
+  // RaceChrono can close the final lap rather than leaving it open.
+  const lastLap = selectedLaps[selectedLaps.length - 1]!.lap
+  if (lastLap.postBoundarySample) {
+    allSamples.push(lastLap.postBoundarySample)
   }
 
   return {
