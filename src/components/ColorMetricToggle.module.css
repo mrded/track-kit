@@ -1,0 +1,52 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: inline-flex;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.option {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: #888;
+  background: #111;
+  border: none;
+  cursor: pointer;
+}
+
+.option:hover {
+  color: #ccc;
+}
+
+.option.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.gradient {
+  width: 8rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgb(37, 99, 235),
+    rgb(34, 197, 94),
+    rgb(250, 204, 21),
+    rgb(239, 68, 68)
+  );
+}

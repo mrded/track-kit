@@ -1,0 +1,21 @@
+.mapWrapper {
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.map {
+  height: 60vh;
+  min-height: 320px;
+  width: 100%;
+  background: #111;
+}
+
+.placeholder {
+  padding: 3rem 1rem;
+  text-align: center;
+  border: 1px dashed #2a2a2a;
+  border-radius: 6px;
+  color: #666;
+  font-size: 0.9rem;
+}

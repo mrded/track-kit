@@ -13,6 +13,8 @@ function makeSession(id: string): Session {
       latIndex: 1,
       lonIndex: 2,
       speedIndex: 3,
+      longAccIndex: -1,
+      leanAngleIndex: -1,
     },
     samples: [],
     laps: [],
@@ -20,7 +22,7 @@ function makeSession(id: string): Session {
 }
 
 function makeSample(time: number): GpsSample {
-  return { raw: `${time} 0 0 50`, time, lat: 0, lon: 0, speed: 50 }
+  return { raw: `${time} 0 0 50`, time, lat: 0, lon: 0, speed: 50, longAcc: 0, leanAngle: 0 }
 }
 
 function makeLap(id: string, samples: GpsSample[]): Lap {

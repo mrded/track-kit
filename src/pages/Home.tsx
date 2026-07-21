@@ -1,92 +1,37 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { Session } from '../parser/types.ts'
-import type { WorkerOutMessage, WorkerInMessage } from '../parser/types.ts'
 import { FileDrop } from '../components/FileDrop.tsx'
 import { SessionCard } from '../components/SessionCard.tsx'
 import { ExportButton } from '../components/ExportButton.tsx'
+import { ParsingStatus } from '../components/ParsingStatus.tsx'
 import { mergeLaps } from '../editor/merge.ts'
 import { exportVbo } from '../editor/export.ts'
 import { tracksMatch } from '../editor/validateSession.ts'
+import { useVboParser } from '../hooks/useVboParser.ts'
 import styles from './Home.module.css'
 
 export function Home() {
-  const [sessions, setSessions] = useState<Session[]>([])
   const [selectedLapIds, setSelectedLapIds] = useState<Set<string>>(new Set())
-  const [parsing, setParsing] = useState(false)
-  const [progress, setProgress] = useState<string[]>([])
-  const [errors, setErrors] = useState<string[]>([])
 
-  const workerRef = useRef<Worker | null>(null)
-  const pendingRef = useRef<Map<string, string>>(new Map()) // id -> fileName
-  const sessionsRef = useRef<Session[]>([]) // mirrors sessions state for use in worker callbacks
+  const validateSession = useCallback((session: Session, existing: Session[]) => {
+    if (existing.length === 0 || tracksMatch(existing[0]!, session)) return undefined
+    const existingVenue = existing[0]!.venue ?? 'unknown track'
+    const newVenue = session.venue ?? 'unknown track'
+    return `${session.fileName} is from ${newVenue} and cannot be mixed with ${existingVenue} sessions.`
+  }, [])
 
-  useEffect(() => {
-    const worker = new Worker(new URL('../worker/parser.worker.ts', import.meta.url), {
-      type: 'module',
+  const onSessionAdded = useCallback((session: Session) => {
+    setSelectedLapIds((prev) => {
+      const next = new Set(prev)
+      for (const lap of session.laps) next.add(lap.id)
+      return next
     })
-
-    worker.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
-      const msg = event.data
-
-      if (msg.type === 'progress') {
-        setProgress((prev) => [...prev, `Parsing ${msg.fileName}…`])
-      } else if (msg.type === 'result') {
-        const existing = sessionsRef.current
-        const conflict = existing.length > 0 && !tracksMatch(existing[0]!, msg.session)
-
-        if (conflict) {
-          const existingVenue = existing[0]!.venue ?? 'unknown track'
-          const newVenue = msg.session.venue ?? 'unknown track'
-          setErrors((prev) => [
-            ...prev,
-            `${msg.session.fileName} is from ${newVenue} and cannot be mixed with ${existingVenue} sessions.`,
-          ])
-        } else {
-          setSessions((prev) => {
-            const next = [...prev, msg.session]
-            sessionsRef.current = next
-            return next
-          })
-          setSelectedLapIds((prev) => {
-            const next = new Set(prev)
-            for (const lap of msg.session.laps) next.add(lap.id)
-            return next
-          })
-        }
-
-        pendingRef.current.delete(msg.id)
-        if (pendingRef.current.size === 0) {
-          setParsing(false)
-          setProgress([])
-        }
-      } else if (msg.type === 'error') {
-        setProgress((prev) => [...prev, `Error: ${msg.fileName} – ${msg.message}`])
-        pendingRef.current.delete(msg.id)
-        if (pendingRef.current.size === 0) {
-          setParsing(false)
-        }
-      }
-    }
-
-    workerRef.current = worker
-    return () => worker.terminate()
   }, [])
 
-  const handleFiles = useCallback((files: File[]) => {
-    setParsing(true)
-    for (const file of files) {
-      const id = crypto.randomUUID()
-      pendingRef.current.set(id, file.name)
-
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const content = e.target?.result as string
-        const msg: WorkerInMessage = { type: 'parse', id, fileName: file.name, content }
-        workerRef.current?.postMessage(msg)
-      }
-      reader.readAsText(file)
-    }
-  }, [])
+  const { sessions, parsing, progress, errors, handleFiles } = useVboParser({
+    validateSession,
+    onSessionAdded,
+  })
 
   const handleToggleLap = useCallback((lapId: string) => {
     setSelectedLapIds((prev) => {
@@ -143,25 +88,7 @@ export function Home() {
       <main className={styles.main}>
         <FileDrop onFiles={handleFiles} disabled={parsing} />
 
-        {parsing && (
-          <div className={styles.progressBox}>
-            {progress.map((msg, i) => (
-              <p key={i} className={styles.progressLine}>
-                {msg}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {errors.length > 0 && (
-          <div className={styles.errorBox}>
-            {errors.map((msg, i) => (
-              <p key={i} className={styles.errorLine}>
-                {msg}
-              </p>
-            ))}
-          </div>
-        )}
+        <ParsingStatus parsing={parsing} progress={progress} errors={errors} />
 
         {sessions.length > 0 && (
           <>
