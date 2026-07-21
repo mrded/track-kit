@@ -65,7 +65,7 @@ export function Home() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>RaceBox VBO Editor</h1>
+        <h1 className={styles.title}>Track Kit</h1>
         <p className={styles.description}>
           This tool lets you import multiple VBO sessions, pick the laps you care about, and export them as a single new session file
           — ready to analyse in RaceChrono Pro or any other tool that supports VBO.
