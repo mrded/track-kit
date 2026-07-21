@@ -10,6 +10,10 @@ export interface GpsSample {
   lon: number
   /** Speed in km/h (or kph as stored in the file) */
   speed: number
+  /** Longitudinal acceleration in g (positive = accelerating, negative = braking); 0 if absent */
+  longAcc: number
+  /** Lean/roll angle in degrees (sign indicates left/right); 0 if absent */
+  leanAngle: number
 }
 
 /** A detected lap within a session */
@@ -52,6 +56,10 @@ export interface VboHeader {
   lonIndex: number
   /** Index of the speed column */
   speedIndex: number
+  /** Index of the longitudinal acceleration column (may be -1 if absent) */
+  longAccIndex: number
+  /** Index of the lean/roll angle column (may be -1 if absent) */
+  leanAngleIndex: number
 }
 
 /** Start/finish line defined by two GPS coordinates */

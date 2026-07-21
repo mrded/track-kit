@@ -17,3 +17,14 @@ body {
   color: #e0e0e0;
   line-height: 1.5;
 }
+
+/* Leaflet's zoom control defaults to a white theme — match the app's dark UI. */
+.leaflet-bar a {
+  background: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a2a !important;
+}
+
+.leaflet-bar a:hover {
+  background: #2a2a2a !important;
+}

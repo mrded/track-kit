@@ -67,6 +67,8 @@ function parseHeader(lines: string[]): VboHeader {
   const latIndex = findColumnIndex(lower, ['lat', 'latitude'])
   const lonIndex = findColumnIndex(lower, ['lng', 'lon', 'long', 'longitude'])
   const speedIndex = findColumnIndex(lower, ['velocity kmh', 'speed', 'velocity', 'kmh'])
+  const longAccIndex = findColumnIndex(lower, ['longacc', 'long acc', 'long_acc'])
+  const leanAngleIndex = findColumnIndex(lower, ['lean-angle', 'lean angle', 'leanangle'])
 
   return {
     sections,
@@ -75,6 +77,8 @@ function parseHeader(lines: string[]): VboHeader {
     latIndex,
     lonIndex,
     speedIndex,
+    longAccIndex,
+    leanAngleIndex,
   }
 }
 
@@ -110,8 +114,11 @@ function parseSamples(lines: string[], header: VboHeader): GpsSample[] {
 
     const time = header.timeIndex >= 0 ? parseTimeField(fields[header.timeIndex] ?? '') : 0
     const lat = header.latIndex >= 0 ? parseCoord(fields[header.latIndex] ?? '') : 0
-    const lon = header.lonIndex >= 0 ? parseCoord(fields[header.lonIndex] ?? '') : 0
+    const lon = header.lonIndex >= 0 ? -parseCoord(fields[header.lonIndex] ?? '') : 0
     const speed = header.speedIndex >= 0 ? parseFloat(fields[header.speedIndex] ?? '0') : 0
+    const longAcc = header.longAccIndex >= 0 ? parseFloat(fields[header.longAccIndex] ?? '0') : 0
+    const leanAngle =
+      header.leanAngleIndex >= 0 ? parseFloat(fields[header.leanAngleIndex] ?? '0') : 0
 
     samples.push({
       raw: trimmed,
@@ -119,6 +126,8 @@ function parseSamples(lines: string[], header: VboHeader): GpsSample[] {
       lat,
       lon,
       speed: isNaN(speed) ? 0 : speed,
+      longAcc: isNaN(longAcc) ? 0 : longAcc,
+      leanAngle: isNaN(leanAngle) ? 0 : leanAngle,
     })
   }
 
@@ -154,19 +163,17 @@ function parseTimeField(field: string): number {
 }
 
 /**
- * Parse a VBO coordinate field.
- * VBO stores coordinates in DDDMM.MMMM format (degrees + decimal minutes).
+ * Parse a VBO coordinate field into decimal degrees.
+ * VBO stores coordinates as signed minutes (the whole number is minutes,
+ * not degrees+minutes) — divide by 60 to get decimal degrees. Latitude is
+ * standard (north positive); longitude is stored with WEST positive, so
+ * callers must negate it to get the conventional east-positive value.
  */
 function parseCoord(field: string): number {
   if (field.length === 0) return 0
   const n = parseFloat(field)
   if (isNaN(n)) return 0
-  // Convert from DDDMM.MMMM to decimal degrees
-  const abs = Math.abs(n)
-  const degrees = Math.floor(abs / 100)
-  const minutes = abs - degrees * 100
-  const decimal = degrees + minutes / 60
-  return n < 0 ? -decimal : decimal
+  return n / 60
 }
 
 /** Parse the venue name from the [comments] section (e.g. "Venue : Bedford"). */
@@ -198,9 +205,9 @@ function parseLaptiming(lines: string[]): StartFinishLine | undefined {
     // tokens: ["Start", lat1, lon1, lat2, lon2, "¬", ...]
     if (tokens.length < 5) continue
     const lat1 = parseCoord(tokens[1] ?? '')
-    const lon1 = parseCoord(tokens[2] ?? '')
+    const lon1 = -parseCoord(tokens[2] ?? '')
     const lat2 = parseCoord(tokens[3] ?? '')
-    const lon2 = parseCoord(tokens[4] ?? '')
+    const lon2 = -parseCoord(tokens[4] ?? '')
     if (lat1 === 0 && lon1 === 0) continue
     return { lat1, lon1, lat2, lon2 }
   }

@@ -3,7 +3,7 @@ import { detectLaps, formatLapTime } from '../lapDetector.ts'
 import type { GpsSample } from '../types.ts'
 
 function makeSample(time: number, speed: number): GpsSample {
-  return { raw: `${time} 0 0 ${speed}`, time, lat: 0, lon: 0, speed }
+  return { raw: `${time} 0 0 ${speed}`, time, lat: 0, lon: 0, speed, longAcc: 0, leanAngle: 0 }
 }
 
 describe('detectLaps', () => {
