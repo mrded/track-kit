@@ -62,6 +62,6 @@ Drop .vbo files → FileDrop → useVboParser (Web Worker)
 - **Track Map coloring:** `heatMetricValue()` in `colorScale.ts` computes what each heat mode colors by — `speed` is raw km/h, `braking` is rectified deceleration (`max(0, -longAcc)`, so accelerating/coasting always reads 0), `cornering` is `abs(leanAngle)` (normalizes left/right turns onto one scale). All three share one blue→green→yellow→red gradient; `'none'` mode draws a single solid-colored polyline per lap instead.
 - **Leaflet Polyline styling:** always pass `color`/`weight` via the `pathOptions` prop, not as top-level props — react-leaflet only re-applies style on prop changes when the `pathOptions` object reference changes; top-level style props are only read once at layer creation.
 - **Lap detection thresholds:** minimum speed 5 km/h, minimum 10 samples; falls back to whole file as one lap.
-- **Vite base path** is `/VBO-editor/` (GitHub Pages sub-directory) — don't change this for production builds.
+- **Vite base path** is `/track-kit/` (GitHub Pages sub-directory, matching the `mrded/track-kit` repo name) — don't change this for production builds.
 - **Code style:** no semicolons, single quotes, trailing commas, 100-char line width (Prettier). TypeScript strict mode with `noUnusedLocals` and `noUnusedParameters`.
 - **Deployment:** push to `main` triggers GitHub Actions → lint → test → build → deploy to GitHub Pages automatically.

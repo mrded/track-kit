@@ -74,7 +74,7 @@ export function Home() {
           Mainly developed around motorcycle track days using RaceBox, so it may not work
           correctly for other situations. If something isn't working, feel free to{' '}
           <a
-            href="https://github.com/mrded/vbo-editor/issues"
+            href="https://github.com/mrded/track-kit/issues"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.descriptionLink}
@@ -116,12 +116,12 @@ export function Home() {
 
       <footer className={styles.footer}>
         <a
-          href="https://github.com/mrded/vbo-editor"
+          href="https://github.com/mrded/track-kit"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.footerLink}
         >
-          github.com/mrded/vbo-editor
+          github.com/mrded/track-kit
         </a>
         <span className={styles.footerText}>by Dmitry Demenchuk</span>
       </footer>

@@ -4,7 +4,7 @@ RaceBox and RaceChrono Pro don't handle multiple sessions well, making it hard t
 
 **Everything runs locally in your browser — your `.vbo` files are never uploaded anywhere.** (The Track Map page does fetch satellite tile images from Esri based on the track's location, same as any map.)
 
-> Mainly developed around motorcycle track days using RaceBox, so it may not work correctly for other situations. If something isn't working, feel free to [open a ticket](https://github.com/mrded/vbo-editor/issues).
+> Mainly developed around motorcycle track days using RaceBox, so it may not work correctly for other situations. If something isn't working, feel free to [open a ticket](https://github.com/mrded/track-kit/issues).
 
 ## Features
 
@@ -23,7 +23,7 @@ Parsing runs in a Web Worker on both pages (UI never freezes).
 
 ## Usage
 
-1. Open [the app](https://mrded.github.io/VBO-editor/)
+1. Open [the app](https://mrded.github.io/track-kit/)
 2. **Editor:** drop your `.vbo` files, tick the laps you want, click **Export merged.vbo**
 3. **Track Map:** switch tabs, drop `.vbo` files, tick laps to preview them on the map, pick a coloring mode
 
